@@ -3,8 +3,8 @@ const express = require("express");
 const router = express.Router();
 
 // ROUTES
-router.get("/", (req, res) => {
-        res.send("Welcome to the auth page!");
+router.get("/sign-up", (req, res) => {
+        res.render("./auth/sign-up.ejs");
 });
 
 // EXPORTING ROUTES
