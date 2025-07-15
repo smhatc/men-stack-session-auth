@@ -26,5 +26,19 @@ router.post("/sign-up", async (req, res) => {
         }
 });
 
+router.get("/sign-in", (req, res) => {
+        res.render("./auth/sign-in.ejs");
+});
+
+router.post("/sign-in", async (req, res) => {
+        const formData = req.body;
+        const userInDatabase = await User.findOne({ username: formData.username, });
+        if (!userInDatabase) {
+                return res.send("An account with this username does not exist. Please sign up first.");
+        } else {
+                const validPassword = bcrypt.compareSync(formData.password, userInDatabase.password);
+        }
+});
+
 // EXPORTING ROUTES
 module.exports = router;
