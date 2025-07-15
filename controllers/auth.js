@@ -1,6 +1,7 @@
 // SETUP
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcrypt");
 const User = require("../models/user.js");
 
 // ROUTES
@@ -15,6 +16,8 @@ router.post("/sign-up", async (req, res) => {
                 if (formData.password !== formData.confirmPassword) {
                         return res.send("The password and confirm password do not match, please try again.");
                 } else {
+                        const hashedPassword = bcrypt.hashSync(formData.password, 10);
+                        formData.password = hashedPassword;
                         const newUser = await User.create(formData);
                         res.send(`Thank you for signing up, ${newUser.username}!`);
                 }
