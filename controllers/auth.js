@@ -37,6 +37,15 @@ router.post("/sign-in", async (req, res) => {
                 return res.send("An account with this username does not exist. Please sign up first.");
         } else {
                 const validPassword = bcrypt.compareSync(formData.password, userInDatabase.password);
+                if (!validPassword) {
+                        return res.send("Sign in failed. Please try again.");
+                } else {
+                        req.session.user = {
+                                username: userInDatabase.username,
+                                _id: userInDatabase._id,
+                        }
+                        res.redirect("/");
+                }
         }
 });
 
