@@ -4,6 +4,7 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT ? process.env.PORT : "3000";
 const morgan = require("morgan");
+const authController = require("./controllers/auth");
 const methodOverride = require("method-override");
 const mongoose = require("mongoose");
 
@@ -21,9 +22,11 @@ app.use(methodOverride("_method"));
 // ROUTES
 app.get("/", (req, res) => {
         res.render("index.ejs", {
-                title: "My App"
+                title: "My App",
         });
 });
+
+app.use("/auth", authController);
 
 // STARTING THE SERVER
 app.listen(port, () => {
