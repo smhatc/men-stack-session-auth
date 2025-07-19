@@ -4,7 +4,7 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT ? process.env.PORT : "3000";
 const morgan = require("morgan");
-const authController = require("./controllers/auth");
+const authController = require("./controllers/auth.js");
 const methodOverride = require("method-override");
 const mongoose = require("mongoose");
 const session = require("express-session");
@@ -16,7 +16,7 @@ mongoose.connection.on("connected", () => {
 });
 
 // MIDDLEWARE
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false, }));
 app.use(morgan("dev"));
 app.use(methodOverride("_method"));
 app.use(session({
@@ -31,6 +31,14 @@ app.get("/", (req, res) => {
                 title: "My App",
                 user: req.session.user,
         });
+});
+
+app.get("/vip-lounge", (req, res) => {
+        if (req.session.user) {
+                res.send(`Welcome to the party, ${req.session.user.username}!`);
+        } else {
+                res.send("Sorry, no guests allowed.");
+        }
 });
 
 app.use("/auth", authController);

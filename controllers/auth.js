@@ -33,20 +33,26 @@ router.get("/sign-in", (req, res) => {
 router.post("/sign-in", async (req, res) => {
         const formData = req.body;
         const userInDatabase = await User.findOne({ username: formData.username, });
+        const failureMessage = "Sign in failed, please try again.";
         if (!userInDatabase) {
-                return res.send("An account with this username does not exist. Please sign up first.");
+                return res.send(failureMessage);
         } else {
                 const validPassword = bcrypt.compareSync(formData.password, userInDatabase.password);
                 if (!validPassword) {
-                        return res.send("Sign in failed. Please try again.");
+                        return res.send(failureMessage);
                 } else {
                         req.session.user = {
                                 username: userInDatabase.username,
                                 _id: userInDatabase._id,
-                        }
+                        };
                         res.redirect("/");
                 }
         }
+});
+
+router.get("/sign-out", (req, res) => {
+        req.session.destroy();
+        res.redirect("/");
 });
 
 // EXPORTING ROUTES
