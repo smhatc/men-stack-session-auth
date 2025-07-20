@@ -19,7 +19,13 @@ router.post("/sign-up", async (req, res) => {
                         const hashedPassword = bcrypt.hashSync(formData.password, 10);
                         formData.password = hashedPassword;
                         const newUser = await User.create(formData);
-                        res.send(`Thank you for signing up, ${newUser.username}!`);
+                        req.session.user = {
+                                username: newUser.username,
+                                _id: newUser._id,
+                        };
+                        req.session.save(() => {
+                                res.redirect("/");
+                        });
                 }
         } else {
                 return res.send("An account with this username already exists.");
@@ -45,14 +51,17 @@ router.post("/sign-in", async (req, res) => {
                                 username: userInDatabase.username,
                                 _id: userInDatabase._id,
                         };
-                        res.redirect("/");
+                        req.session.save(() => {
+                                res.redirect("/");
+                        });
                 }
         }
 });
 
 router.get("/sign-out", (req, res) => {
-        req.session.destroy();
-        res.redirect("/");
+        req.session.destroy(() => {
+                res.redirect("/");
+        });
 });
 
 // EXPORTING ROUTES

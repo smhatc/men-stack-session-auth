@@ -8,6 +8,9 @@ const authController = require("./controllers/auth.js");
 const methodOverride = require("method-override");
 const mongoose = require("mongoose");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
+const isSignedIn = require("./middleware/is-signed-in.js");
+const passUserToView = require("./middleware/pass-user-to-view.js");
 
 // DATABASE CONNECTION
 mongoose.connect(process.env.MONGODB_URI);
@@ -23,22 +26,21 @@ app.use(session({
         secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: true,
+        store: MongoStore.create({
+        mongoUrl: process.env.MONGODB_URI
+        }),
 }));
+app.use(passUserToView);
 
 // ROUTES
 app.get("/", (req, res) => {
         res.render("index.ejs", {
-                title: "My App",
-                user: req.session.user,
+                title: "My App"
         });
 });
 
-app.get("/vip-lounge", (req, res) => {
-        if (req.session.user) {
-                res.send(`Welcome to the party, ${req.session.user.username}!`);
-        } else {
-                res.send("Sorry, no guests allowed.");
-        }
+app.get("/vip-lounge", isSignedIn, (req, res) => {
+        res.send(`Welcome to the party, ${req.session.user.username}!`);
 });
 
 app.use("/auth", authController);
